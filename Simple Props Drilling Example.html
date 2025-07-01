@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>React User Context App</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.development.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input { padding: 5px; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/javascript">
+    const { useState, useEffect, useContext, createContext } = React;
+    const { BrowserRouter, Routes, Route, Link, useNavigate } = ReactRouterDOM;
+
+    const UserContext = createContext();
+
+    function UserProvider({ children }) {
+      const [user, setUser] = useState({
+        name: "Abhishek Mishra",
+        email: "abhishek@example.com"
+      });
+      return (
+        <UserContext.Provider value={{ user, setUser }}>
+          {children}
+        </UserContext.Provider>
+      );
+    }
+
+    function Home() {
+      return (
+        <div>
+          <h2>🏠 Home</h2>
+          <Link to="/profile">Go to Profile</Link><br />
+          <Link to="/settings">Go to Settings</Link>
+        </div>
+      );
+    }
+
+    function Profile() {
+      const { user } = useContext(UserContext);
+      return (
+        <div>
+          <h2>👤 Profile</h2>
+          <p><strong>Name:</strong> {user.name}</p>
+          <p><strong>Email:</strong> {user.email}</p>
+        </div>
+      );
+    }
+
+    function Settings() {
+      const { user, setUser } = useContext(UserContext);
+      const [form, setForm] = useState({ name: user.name, email: user.email });
+
+      function handleChange(e) {
+        setForm({ ...form, [e.target.name]: e.target.value });
+      }
+
+      function handleSubmit() {
+        setUser(form);
+        alert("Profile updated!");
+      }
+
+      return (
+        <div>
+          <h2>⚙️ Settings</h2>
+          <input name="name" value={form.name} onChange={handleChange} /><br />
+          <input name="email" value={form.email} onChange={handleChange} /><br />
+          <button onClick={handleSubmit}>Update</button>
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <BrowserRouter>
+          <UserProvider>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+            </Routes>
+          </UserProvider>
+        </BrowserRouter>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
